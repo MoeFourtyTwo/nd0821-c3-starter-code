@@ -26,7 +26,6 @@ jobs:
           pip install flake8 pytest
           cd starter
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-
       - name: "Configure AWS Credentials" Action For GitHub Actions
         uses: aws-actions/configure-aws-credentials@v1
         with:
@@ -34,13 +33,10 @@ jobs:
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: us-east-2
           role-session-name: action-session
-
       - uses: iterative/setup-dvc@v1
-
       - name: Pull DVC
         run: |
           dvc pull
-
       - name: Lint with flake8
         run: |
           cd starter
