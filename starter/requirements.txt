@@ -6,3 +6,5 @@ requests
 fastapi~=0.70.0
 uvicorn
 gunicorn
+black
+flake8
