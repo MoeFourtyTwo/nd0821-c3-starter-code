@@ -8,3 +8,4 @@ uvicorn
 gunicorn
 black
 flake8
+loguru

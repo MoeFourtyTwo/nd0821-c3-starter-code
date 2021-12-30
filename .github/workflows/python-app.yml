@@ -27,7 +27,8 @@ jobs:
           python -m pip install --upgrade pip
           pip install flake8 pytest
           cd starter
-          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi,
+          pip install -r .
 
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v1
@@ -47,7 +48,7 @@ jobs:
         run: |
           cd starter
           flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
-          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=120 --statistics
 
       - name: Test with pytest
         run: |
