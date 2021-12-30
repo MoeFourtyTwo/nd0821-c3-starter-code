@@ -35,6 +35,12 @@ jobs:
         aws-region: us-east-2
         role-session-name: action-session
 
+    - uses: iterative/setup-dvc@v1
+
+    - name: Pull DVC
+      run: |
+        dvc pull
+
     - name: Lint with flake8
       run: |
         cd starter
