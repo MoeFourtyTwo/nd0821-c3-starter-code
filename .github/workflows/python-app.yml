@@ -28,7 +28,7 @@ jobs:
           pip install flake8 pytest
           cd starter
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi,
-          pip install -r .
+          pip install .
 
       - name: "Configure AWS Credentials"
         uses: aws-actions/configure-aws-credentials@v1
