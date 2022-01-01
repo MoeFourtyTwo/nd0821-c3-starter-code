@@ -1,50 +1,56 @@
-# Script to train machine learning model.
+import fire as fire
 import pandas as pd
+from lightautoml.automl.base import AutoML
 from loguru import logger
-from sklearn.model_selection import train_test_split
 
-# Add the necessary imports for the starter code.
-
-# Add code to load in the data.
-from starter.ml.data import process_data
-from starter.ml.model import train_model, inference, compute_model_metrics
+from starter.ml.data import load_data, split_data, find_slices, get_slice
+from starter.ml.model import predict, compute_model_metrics, train_model, save_model, load_model
 
 
-def main():
-    data = pd.read_csv("../data/census_cleaned.csv")
-    # Optional enhancement, use K-fold cross validation instead of a train-test split.
-    train, test = train_test_split(data, test_size=0.20)
-    cat_features = [
-        "workclass",
-        "education",
-        "marital-status",
-        "occupation",
-        "relationship",
-        "race",
-        "sex",
-        "native-country",
-    ]
-    X_train, y_train, encoder, lb = process_data(
-        train, categorical_features=cat_features, label="salary", training=True
+def main(load_saved_model: bool = False) -> None:
+    data = load_data()
+    train_df, test_df = split_data(data)
+
+    if load_saved_model:
+        logger.info("Loading saved model...")
+        model = load_model("../model/model.pkl")
+    else:
+        logger.info("Training model from scratch...")
+        model = train_model(train_df)
+        save_model(model, "../model/model.pkl")
+
+    logger.info("Generating report...")
+    generate_report(model, test_df)
+
+
+def generate_report(model: AutoML, test_df: pd.DataFrame) -> None:
+    predictions = predict(model, test_df)
+    precision, recall, fbeta = compute_model_metrics(test_df["salary"], predictions)
+
+    report = pd.DataFrame(columns=["Category", "Value", "Samples", "Precision", "Recall", "F-beta"])
+    report = report.append(
+        {"Samples": len(test_df), "Precision": precision, "Recall": recall, "F-beta": fbeta}, ignore_index=True
     )
-    # Proces the test data with the process_data function.
-    X_test, y_test, *_ = process_data(
-        test,
-        categorical_features=cat_features,
-        label="salary",
-        training=False,
-        encoder=encoder,
-        lb=lb,
-    )
-    # Train and save a model.
-    tree = train_model(X_train, y_train)
-    predict = inference(tree, X_test)
-    precision, recall, fbeta = compute_model_metrics(y_test, predict)
-
-    logger.info(f"Precision: {precision}")
-    logger.info(f"Recall: {recall}")
-    logger.info(f"F-beta: {fbeta}")
+    for category, values in find_slices(test_df).items():
+        for value in values:
+            slice_df = get_slice(test_df, category, value)
+            predictions = predict(model, slice_df)
+            precision, recall, fbeta = compute_model_metrics(slice_df["salary"], predictions)
+            report = report.append(
+                {
+                    "Category": category,
+                    "Value": value,
+                    "Samples": len(slice_df),
+                    "Precision": precision,
+                    "Recall": recall,
+                    "F-beta": fbeta,
+                },
+                ignore_index=True,
+            )
+    with open("../model/slice_output.txt", "w") as f:
+        f.write(report.to_markdown())
+        logger.info("Report generated at ../model/slice_output.txt")
 
 
 if __name__ == "__main__":
-    main()
+    fire.Fire(main)

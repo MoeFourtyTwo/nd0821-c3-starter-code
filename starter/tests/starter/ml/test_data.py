@@ -1,24 +1,36 @@
-import numpy as np
+import pathlib
 
-from starter.ml.data import process_data
+import pandas as pd
+
+from starter.ml.data import load_data, convert_salary_column, split_data, find_slices
 
 
-def test_process_data(train_data):
-    cat_features = [
-        "workclass",
-        "education",
-        "marital-status",
-        "occupation",
-        "relationship",
-        "race",
-        "sex",
-        "native-country",
-    ]
-    X_train, y_train, encoder, lb = process_data(
-        train_data, categorical_features=cat_features, label="salary", training=True
-    )
+def test_load_data(data_file: pathlib.Path) -> None:
+    data = load_data(data_file)
 
-    assert isinstance(X_train, np.ndarray)
-    assert X_train.shape[0] == train_data.shape[0]
-    assert X_train.shape[1] == 108
-    assert isinstance(y_train, np.ndarray)
+    assert len(data) > 10000
+
+
+def test_convert_salary_column(data_file: pathlib.Path) -> None:
+    data = pd.read_csv(data_file)
+
+    assert data["salary"].dtype == "object"
+    data = convert_salary_column(data)
+    assert data["salary"].dtype == "float64"
+
+
+def test_split_data(data_file: pathlib.Path) -> None:
+    data = pd.read_csv(data_file)
+
+    train, test = split_data(data)
+
+    assert len(train) + len(test) == len(data)
+    assert len(train) > 0.8 / 0.2 * len(test) - 5  # offset of 5 for rounding errors
+
+
+def test_find_slcices(data_file: pathlib.Path) -> None:
+    data = pd.read_csv(data_file)
+
+    slices = find_slices(data)
+
+    assert len(slices) == 8
