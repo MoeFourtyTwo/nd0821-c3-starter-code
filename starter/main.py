@@ -32,7 +32,7 @@ class InferenceRequestResponse(pydantic.BaseModel):
 class InferenceRequestBody(pydantic.BaseModel):
     age: int = pydantic.Field(..., example=39)
     workclass: str = pydantic.Field(..., example="State-gov")
-    fnlgt: int = pydantic.Field(..., example=20885, alias="fnlwgt")
+    fnlgt: int = pydantic.Field(..., example=20885)
     education: str = pydantic.Field(..., example="Bachelors")
     education_num: int = pydantic.Field(..., example=13, alias="education-num")
     marital_status: str = pydantic.Field(..., example="Never-married", alias="marital-status")
