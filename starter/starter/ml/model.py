@@ -67,6 +67,7 @@ def predict(model: AutoML, data: pd.DataFrame) -> np.ndarray:
     Returns:
         Predictions.
     """
+    data.columns = [c.replace("_", "-") for c in data.columns]
     predictions = model.predict(data)
     predictions = (np.squeeze(predictions.data, axis=-1) > 0.5) * 1.0
     return predictions
