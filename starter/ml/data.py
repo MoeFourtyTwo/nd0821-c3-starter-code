@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import pathlib
-from typing import Optional
+from typing import Optional, List, Dict, Tuple
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
@@ -35,7 +35,7 @@ def convert_salary_column(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def split_data(data: pd.DataFrame, train_size: float = 0.8) -> (pd.DataFrame, pd.DataFrame):
+def split_data(data: pd.DataFrame, train_size: float = 0.8) -> Tuple[pd.DataFrame, pd.DataFrame]:
     """Splits the data into training and test sets.
     Args:
         data: DataFrame containing the data.
@@ -61,7 +61,7 @@ def get_slice(data: pd.DataFrame, column: str, value: str) -> pd.DataFrame:
     return data[data[column] == value]
 
 
-def find_slices(data: pd.DataFrame, exclude: Optional[list] = None) -> dict[str, list[str]]:
+def find_slices(data: pd.DataFrame, exclude: Optional[List] = None) -> Dict[str, List[str]]:
     exclude = exclude or ["salary"]
 
     slices = {

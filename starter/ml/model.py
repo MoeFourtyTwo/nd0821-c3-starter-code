@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import pathlib
+from typing import Tuple
 
 import joblib
 import numpy as np
@@ -53,7 +54,7 @@ def train_model(train_df: pd.DataFrame, target: str = "salary", timeout: int = 3
     return automl
 
 
-def compute_model_metrics(y_true, y_pred) -> tuple[float, float, float]:
+def compute_model_metrics(y_true, y_pred) -> Tuple[float, float, float]:
     """Validates the trained machine learning model using precision, recall, and F beta.
 
     Args:
