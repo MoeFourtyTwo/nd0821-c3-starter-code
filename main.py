@@ -19,7 +19,7 @@ def init():
     """Startup event that pulls from dvc if necessary and loads model into app state."""
     if "DYNO" in os.environ and pathlib.Path(".dvc").exists():
         logger.info("Running on Heroku. Performing DVC pull...")
-        subprocess.call(["dvc", "config core.no_scm", "true"])
+        subprocess.call(["dvc", "config", "core.no_scm", "true"])
         return_value = subprocess.call(["dvc", "pull"])
         if return_value != 0:
             logger.error("DVC pull failed. Exiting...")
