@@ -34,9 +34,7 @@ class Values(enum.Enum):
 
     @classmethod
     def from_int(cls, value: int) -> str:
-        if value == 0:
-            return Values.under
-        return Values.over
+        return Values.under if value == 0 else Values.over
 
 
 class PredictionRequestResponse(pydantic.BaseModel):

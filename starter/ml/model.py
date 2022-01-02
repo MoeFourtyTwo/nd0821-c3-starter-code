@@ -17,7 +17,7 @@ _ROOT = pathlib.Path(__file__).parent.parent.parent
 
 
 def default_model_path() -> pathlib.Path:
-    return _ROOT / "model/model.pkl"
+    return _ROOT / "model/encoder_and_model.pkl"
 
 
 def train_model(train_df: pd.DataFrame, target: str = "salary", timeout: int = 3600) -> AutoML:
