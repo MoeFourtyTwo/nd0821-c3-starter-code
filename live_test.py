@@ -18,6 +18,8 @@ if __name__ == "__main__":
         "native-country": "United-States",
     }
 
-    response = requests.post("https://udacity-census-ms.herokuapp.com/predict", json=payload)
-    print(response.status_code)
-    print(response.json())
+    url = "https://udacity-census-ms.herokuapp.com/predict"
+    response = requests.post(url, json=payload)
+    print(f"{url=}")
+    print(f"{response.status_code=}")
+    print(f"{response.json()=}")
