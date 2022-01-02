@@ -5,7 +5,7 @@ pytest
 requests
 fastapi~=0.70.0
 uvicorn
-gunicorn
 loguru~=0.5.3
 fire~=0.4.0
 lightautoml~=0.3.2
+dvc[s3]

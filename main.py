@@ -1,17 +1,31 @@
 import enum
+import os
+import pathlib
+import subprocess
 
 import pandas as pd
 import pydantic
 from fastapi import FastAPI
+from loguru import logger
 
 from starter.ml.model import load_model, predict
+
 
 app = FastAPI()
 
 
 @app.on_event("startup")
-def init_model():
-    app.state.model = load_model("./model/model.pkl")
+def init():
+    """Startup event that pulls from dvc if necessary and loads model into app state."""
+    if "DYNO" in os.environ and pathlib.Path(".dvc").exists():
+        logger.info("Running on Heroku. Performing DVC pull...")
+        subprocess.call(["dvc", "config core.no_scm", "true"])
+        return_value = subprocess.call(["dvc", "pull"])
+        if return_value != 0:
+            logger.error("DVC pull failed. Exiting...")
+            exit(return_value)
+        logger.info("DVC pull successful.")
+    app.state.model = load_model()
 
 
 class Values(enum.Enum):
@@ -25,11 +39,11 @@ class Values(enum.Enum):
         return Values.over
 
 
-class InferenceRequestResponse(pydantic.BaseModel):
+class PredictionRequestResponse(pydantic.BaseModel):
     prediction: Values
 
 
-class InferenceRequestBody(pydantic.BaseModel):
+class PredictionRequestBody(pydantic.BaseModel):
     age: int = pydantic.Field(..., example=39)
     workclass: str = pydantic.Field(..., example="State-gov")
     fnlgt: int = pydantic.Field(..., example=20885)
@@ -47,12 +61,14 @@ class InferenceRequestBody(pydantic.BaseModel):
 
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+async def get_root():
+    """Greetings endpoint."""
+    return {"message": "Greetings!"}
 
 
-@app.post("/inference", response_model=InferenceRequestResponse)
-async def inference(body: InferenceRequestBody) -> InferenceRequestResponse:
-    return InferenceRequestResponse(
+@app.post("/predict", response_model=PredictionRequestResponse)
+async def post_predict(body: PredictionRequestBody) -> PredictionRequestResponse:
+    """Perform prediction on given input."""
+    return PredictionRequestResponse(
         prediction=Values.from_int(int(predict(app.state.model, pd.DataFrame(body.dict(), index=[0]))))
     )

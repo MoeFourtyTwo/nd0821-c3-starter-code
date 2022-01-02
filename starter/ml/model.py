@@ -1,3 +1,7 @@
+from __future__ import annotations
+
+import pathlib
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -7,6 +11,12 @@ from lightautoml.dataset.roles import NumericRole, CategoryRole
 from lightautoml.tasks import Task
 from lightautoml.tasks.common_metric import BestClassBinaryWrapper, F1Factory
 from sklearn.metrics import fbeta_score, precision_score, recall_score
+
+_ROOT = pathlib.Path(__file__).parent.parent.parent
+
+
+def default_model_path() -> pathlib.Path:
+    return _ROOT / "model/model.pkl"
 
 
 def train_model(train_df: pd.DataFrame, target: str = "salary", timeout: int = 3600) -> AutoML:
@@ -73,7 +83,7 @@ def predict(model: AutoML, data: pd.DataFrame) -> np.ndarray:
     return predictions
 
 
-def save_model(model: AutoML, target: str) -> None:
+def save_model(model: AutoML, target: str | pathlib.Path = default_model_path()) -> None:
     """Save the model to a file.
     Args:
         model: Trained machine learning model.
@@ -85,7 +95,7 @@ def save_model(model: AutoML, target: str) -> None:
     joblib.dump(model, target)
 
 
-def load_model(target: str) -> AutoML:
+def load_model(target: str | pathlib.Path = default_model_path()) -> AutoML:
     """Loads a model from a file.
     Args:
         target: Path to save the model.
